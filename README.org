@@ -1,0 +1,60 @@
+#+PROPERTY: :header-args:sql :product postgres
+
+* TimescaleDB, netdata and Grafana
+
+** Sample queries
+
+#+BEGIN_SRC sql
+  SELECT time, host, metrics FROM netdata WHERE metrics ? 'system.load.load1' LIMIT 1 ;
+
+  SELECT time, host, metrics FROM netdata ORDER BY time DESC LIMIT 1 ;
+
+  SELECT time, host, d.metric, d.value::text::float FROM netdata, json_each(metrics::json) with ordinality as d(metric,value) WHERE metrics ?| array['system.load.load1'] LIMIT 10;
+
+  SELECT time, host, d.metric, d.value::text::float FROM netdata, json_each(metrics::json) with ordinality as d(metric,value) WHERE metrics ?| array['disk.mmcblk0.reads'] AND d.metric LIKE 'disk.%' LIMIT 10;
+#+END_SRC
+
+** Cost of a JSON query
+
+#+BEGIN_SRC sql
+  EXPLAIN ANALYZE SELECT time, host, d.metric, d.value::text::float FROM netdata, json_each(metrics::json) WITH ordinality as d(metric,value) WHERE d.metric LIKE 'disk.%' LIMIT 10;
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+ Nested Loop  (cost=0.01..655.48 rows=466 width=61) (actual time=0.815..58.299 rows=1880 loops=1)
+   ->  Append  (cost=0.00..63.65 rows=466 width=943) (actual time=0.027..0.509 rows=470 loops=1)
+         ->  Seq Scan on netdata  (cost=0.00..0.00 rows=1 width=72) (actual time=0.012..0.012 rows=0 loops=1)
+         ->  Seq Scan on _hyper_1_1_chunk  (cost=0.00..63.65 rows=465 width=945) (actual time=0.013..0.423 rows=470 loops=1)
+   ->  Function Scan on json_each d  (cost=0.01..1.26 rows=1 width=64) (actual time=0.107..0.116 rows=4 loops=470)
+         Filter: (metric ~~ 'disk.%'::text)
+         Rows Removed by Filter: 46
+ Planning time: 0.543 ms
+ Execution time: 58.536 ms
+#+END_EXAMPLE
+
+** Links
+
++ Using PostgreSQL in Grafana :: http://docs.grafana.org/features/datasources/postgres/
++ TimescaleDB: Table management :: https://docs.timescale.com/v0.11/using-timescaledb/schema-management
+
+** TODO An attempt at literate programming with SQL
+/Doesn't work yet, but it was a nice idea.../
+https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-sql.html
+
+#+BEGIN_SRC elisp
+  ;; active Babel languages
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((sql . t)))
+  ;; add additional languages with '((language . t)))
+
+  (let ((sql-port 55435)
+        (sql-user "user1")
+        (sql-server "localhost")
+        (sql-database "metrics")
+        (sql-password "password")
+        (buffer-name  "*timescaledb sql*"))
+    (sql-comint-postgres 'postgres '() buffer-name)
+    (setq sql-buffer buffer-name)
+    (run-hooks 'sql-set-sqli-hook))
+#+END_SRC
