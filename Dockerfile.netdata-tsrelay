@@ -1,0 +1,21 @@
+FROM runejuhl/nim:0.18.0-ubuntu-regular
+WORKDIR /tmp/netdata_tsrelay
+
+RUN apt-get update && \
+    apt-get install -y \
+            make \
+            unzip \
+            libpq-dev
+
+RUN wget https://bitbucket.org/mahlon/netdata-tsrelay/get/ed87882bb7f0.zip && \
+    unzip -j ed87882bb7f0.zip
+RUN make release
+
+FROM ubuntu:xenial
+
+RUN apt-get update && \
+    apt-get install -y \
+            libpq5
+
+COPY --from=0 /tmp/netdata_tsrelay/netdata_tsrelay /usr/local/bin/
+ENTRYPOINT ["/usr/local/bin/netdata_tsrelay"]

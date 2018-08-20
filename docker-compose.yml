@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  grafana:
+    hostname: grafana
+    image: grafana/grafana:5.2.2
+    networks:
+      - internal
+      - external
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+
+  timescaledb:
+    hostname: postgres
+    image: timescale/timescaledb:0.11.0-pg10
+    networks:
+      internal:
+        aliases:
+          - postgres
+    expose:
+      - 5432
+    ports:
+      - 55435:5432
+
+  tsrelay:
+    hostname: tsrelay
+    image: runejuhl/netdata-tsrelay:1534767430
+    command: 'netdata_tsrelay --dbopts="host=postgres port=5432 dbname=metrics user=user1 password=password" -d'
+    networks:
+      internal:
+        aliases:
+          - tsrelay
+      external:
+        aliases:
+          - tsrelay
+networks:
+  external:
+  internal:
