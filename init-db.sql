@@ -20,4 +20,4 @@ CREATE TABLE netdata (
 GRANT SELECT, INSERT ON netdata TO user1;
 
 -- auto partition weekly
-SELECT create_hypertable( 'netdata', 'time', migrate_data => true, chunk_time_interval => '1 week'::interval );
+SELECT create_hypertable( 'netdata', 'time', migrate_data => true, chunk_time_interval => '1 week'::INTERVAL );

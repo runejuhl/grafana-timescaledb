@@ -35,6 +35,16 @@ services:
       external:
         aliases:
           - tsrelay
+
+  netdata:
+    image: firehol/netdata:latest
+    networks:
+      - external
+    ports:
+      - 19999:19999
+    volumes:
+      - ./netdata.conf:/etc/netdata/netdata.conf
+
 networks:
   external:
   internal:
