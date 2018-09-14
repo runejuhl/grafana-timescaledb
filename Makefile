@@ -12,6 +12,9 @@ up:
 .PHONY: down
 down:
 	docker-compose kill
+
+.PHONY: clean
+clean:
 	docker-compose rm -f
 
 .PHONY: logs
