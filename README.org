@@ -2,6 +2,28 @@
 
 * TimescaleDB, netdata and Grafana
 
+A complete system for testing, experimentation and playing around with [[https://netdata.io/][netdata]],
+[[https://github.com/timescale/timescaledb][TimescaleDB]] and [[https://grafana.net/][Grafana]]. [[https://bitbucket.org/mahlon/netdata-tsrelay/][Using netdata-tsrelay]] to relay metrics from netdata to
+TimescaleDB.
+
+Provides a full system for testing and experimentation. To start it all, run:
+
+#+BEGIN_SRC sh
+  make up logs
+#+END_SRC
+
+After the system has started, browse to [[http://localhost:3000]]. Here you need to
+set a new Grafana password, and add a data source.
+
+The data source should have the following values:
+
++ host :: =timescaledb:5432=
++ user :: =user1=
++ password :: =password=
++ database :: =metrics=
+
+A simple [[file:grafana-basic_metrics.json][dashboard]] can be imported into Grafana.
+
 ** Sample queries
 
 #+BEGIN_SRC sql
