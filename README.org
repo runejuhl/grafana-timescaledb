@@ -9,6 +9,10 @@ TimescaleDB.
 Provides a full system for testing and experimentation. To start it all, run:
 
 #+BEGIN_SRC sh
+  make up
+  # wait a bit for stuff to start
+  make bootstrap
+  # start tsrelay now that the DB is initialized
   make up logs
 #+END_SRC
 
@@ -64,6 +68,7 @@ A simple [[file:grafana-basic_metrics.json][dashboard]] can be imported into Gra
 + [[https://github.com/trivago/hamara][trivago]] for [[https://github.com/trivago/hamara][Hamara]] :: which I used to
      dump the Grafana datasource config for TimescaleDB, since Grafana [[https://github.com/grafana/grafana/issues/11495][doesn't
      support that natively]]
++ [[https://riamf.github.io/][Pawel Kowalczuk]] for [[https://riamf.github.io/posts/dockerized_grafana_setup/][a guide to Dockerized Grafana setup]] ::
 
 ** TODO An attempt at literate programming with SQL
 /Doesn't work yet, but it was a nice idea.../
