@@ -1,21 +1,24 @@
-FROM runejuhl/nim:0.18.0-ubuntu-regular
+FROM runejuhl/nim:0.18.0-ubuntu-regular AS build
 WORKDIR /tmp/netdata_tsrelay
+
+ENV NETDATA_TSRELAY_VERSION=v0.2.0
 
 RUN apt-get update && \
     apt-get install -y \
             make \
-            unzip \
             libpq-dev
 
-RUN wget https://bitbucket.org/mahlon/netdata-tsrelay/get/ed87882bb7f0.zip && \
-    unzip -j ed87882bb7f0.zip
+RUN wget "https://github.com/mahlonsmith/netdata-timescale-relay/archive/${NETDATA_TSRELAY_VERSION}.tar.gz" && \
+    tar axf "${NETDATA_TSRELAY_VERSION}.tar.gz" --strip-components=1
 RUN make release
 
 FROM ubuntu:xenial
 
 RUN apt-get update && \
     apt-get install -y \
-            libpq5
+    libpq5 && \
+    apt-get autoclean && \
+    rm -rf /var/cache/*
 
-COPY --from=0 /tmp/netdata_tsrelay/netdata_tsrelay /usr/local/bin/
+COPY --from=build /tmp/netdata_tsrelay/netdata_tsrelay /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/netdata_tsrelay"]
