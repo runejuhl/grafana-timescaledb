@@ -32,7 +32,7 @@ services:
 
   tsrelay:
     hostname: tsrelay
-    image: runejuhl/netdata-tsrelay:1534767430
+    image: runejuhl/netdata-tsrelay:1571856892
     command: 'netdata_tsrelay --dbopts="host=postgres port=5432 dbname=metrics user=user1 password=password" -d'
     networks:
       internal:
