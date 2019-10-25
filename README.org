@@ -1,5 +1,13 @@
 #+PROPERTY: :header-args:sql :product postgres
 
+* NOTE!
+
+This project is broken at the moment. I'll try to get it fixed ASAP; have a look
+in https://github.com/runejuhl/grafana-timescaledb/tree/dev for a WIP
+development branch.
+
+/runejuhl/
+
 * TimescaleDB, netdata and Grafana
 
 A complete system for testing, experimentation and playing around with [[https://netdata.io/][netdata]],
