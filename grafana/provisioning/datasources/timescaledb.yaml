@@ -10,7 +10,7 @@ datasources:
   url: 172.19.0.2:5432
   user: user1
   database: metrics
-  isDefault: true
+  isDefault: false
   jsonData:
     postgresVersion: 1000
     sslmode: verify-full

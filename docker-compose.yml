@@ -16,31 +16,27 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
     volumes:
+      # - ./grafana/dashboards:/etc/grafana/dashboards:ro
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/provisioning/dashboards/:/var/lib/grafana/dashboards/:ro
 
-  timescaledb:
-    hostname: postgres
-    image: timescale/timescaledb:1.4.2-pg10
+  prometheus:
+    hostname: prometheus
+    image: prom/prometheus:v2.15.2
     networks:
       internal:
-        aliases:
-          - postgres
     expose:
-      - 5432
+      - 9090
     ports:
-      - 55435:5432
-
-  tsrelay:
-    hostname: tsrelay
-    image: runejuhl/netdata-tsrelay:1534767430
-    command: 'netdata_tsrelay --dbopts="host=postgres port=5432 dbname=metrics user=user1 password=password" -d'
-    networks:
-      internal:
-        aliases:
-          - tsrelay
-      external:
-        aliases:
-          - tsrelay
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--log.level=debug'
 
   netdata:
     image: firehol/netdata:latest
@@ -48,7 +44,7 @@ services:
       - external
       - internal
     ports:
-      - 19999:19999
+      - 19998:19999
     volumes:
       - ./netdata.conf:/etc/netdata/netdata.conf
 
