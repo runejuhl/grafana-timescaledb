@@ -21,7 +21,7 @@ clean:
 
 .PHONY: logs
 logs:
-	docker-compose logs -f
+	docker-compose logs -f --tail=5
 
 .PHONY: psql
 psql:
