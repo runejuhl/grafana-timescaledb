@@ -1,0 +1,39 @@
+---
+version: '3.1'
+services:
+  web:
+    image: alerta/alerta-web
+    volumes:
+      - ./alerta/config/alertad.conf:/app/alertad.conf
+      - ./alerta/config/alerta.conf:/app/alerta.conf
+      - ./alerta/config/config.json:/web/config.json
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1  # remove this line to turn DEBUG off
+      # - BASE_URL=/alerta/api  # NOTE: must end in '/api' then web URL will be '/alerta'
+      - AUTH_REQUIRED=True
+      - ADMIN_USERS=admin@alerta.io,devops@alerta.io
+      # - ADMIN_USERS=admin@alerta.io
+      # - ADMIN_PASSWORD=password
+      - ADMIN_KEY=demo-admin-key
+      - "COLORS={'severity': {'fatal': '#303030'}, 'text': 'white'}"
+      - "SEVERITY={'fatal': 0}"
+      - TRACKING_ID=UA-44644195-6
+      - PLUGINS=reject,heartbeat,blackout,normalise,enhance
+    restart: always
+
+services:
+  postgres:
+    image: postgres:10
+    environment:
+      - POSTGRES_DB=puppetdb
+      - POSTGRES_USER=puppetdb
+      - POSTGRES_PASSWORD=puppetdb
+    expose:
+      - 5432
+    volumes:
+      - ./.docker/postgres/data:/var/lib/postgresql/data/
+      - ./test/postgres/init/:/docker-entrypoint-initdb.d/

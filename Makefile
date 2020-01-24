@@ -1,5 +1,9 @@
 BOOTSTRAP_SQL ?= ./init-db.sql
 PG_RESTORE = pg_restore --create --if-exists --clean $(DB_DUMP)
+DC_PROMETHEUS_CONFIG = docker-compose.yml
+DC_ALERTA_CONFIG = docker-compose.alerta.yml
+
+DC_ALERTA = docker-compose -f $(DC_ALERTA_CONFIG) -f $(DC_PROMETHEUS_CONFIG)
 
 export COMPOSE_PROJECT_NAME=grafana-timescaledb
 
@@ -30,3 +34,11 @@ psql:
 .PHONY: bootstrap
 bootstrap: $(BOOTSTRAP_SQL)
 	docker exec -i --user postgres grafana-timescaledb_timescaledb_1 psql postgres < $(BOOTSTRAP_SQL)
+
+.PHONY: alerta/up
+alerta/up:
+	$(DC_ALERTA) up -d
+
+.PHONY: alerta/logs
+alerta/logs:
+	$(DC_ALERTA) logs -f --tail=5

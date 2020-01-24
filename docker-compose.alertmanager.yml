@@ -1,0 +1,17 @@
+---
+version: '3.1'
+
+services:
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - ./config:/prometheus
+      - ./data/alertmanager:/data
+    command:
+      - '--config.file=/prometheus/alertmanager.yml'
+      - '--storage.path=/data'
+    ports:
+      - 9093:9093
+    networks:
+      - alerta_sharednet
+      - promnet
