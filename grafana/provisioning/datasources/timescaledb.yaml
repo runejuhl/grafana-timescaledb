@@ -1,19 +1,20 @@
-# # config file version
 apiVersion: 1
 
 datasources:
-- orgId: 1
-  version: 3
-  name: TimescaleDB
-  type: postgres
-  access: proxy
-  url: 172.19.0.2:5432
-  user: user1
-  database: metrics
-  isDefault: true
-  jsonData:
-    postgresVersion: 1000
-    sslmode: verify-full
-    timescaledb: true
-  secureJsonData:
-    password: password
+  - id: 1
+    orgId: 1
+    name: TimescaleDB
+    type: postgres
+    access: proxy
+    url: "timescaledb:5432"
+    user: user1
+    database: metrics
+    basicAuth: false
+    withCredentials: false
+    isDefault: true
+    jsonData: {postgresVersion: 1000, sslmode: "disable", timescaledb: true}
+    secureJsonFields: {password: true}
+    secureJsonData: {password: password}
+    version: 4
+    readOnly: false
+    editable: true
