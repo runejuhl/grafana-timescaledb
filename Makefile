@@ -1,32 +1,22 @@
-BOOTSTRAP_SQL ?= ./init-db.sql
-PG_RESTORE = pg_restore --create --if-exists --clean $(DB_DUMP)
-
-export COMPOSE_PROJECT_NAME=grafana-timescaledb
-
-.PHONY: docker
-docker: Dockerfile.netdata-tsrelay
-	docker build -f Dockerfile.netdata-tsrelay -t runejuhl/netdata-tsrelay:$(shell date +%s) . # -t runejuhl/netdata-tsrelay:latest
-
-.PHONY: up
+.PHONY: up-default up-tsrelay up down clean logs psql start
 up:
-	docker-compose up -d
+	docker-compose up -d -V --build --force-recreate grafana timescaledb netdata
 
-.PHONY: down
+#todo add wait-for-it.sh to tsrelay container
+up-tsrelay:
+	sleep 10 && docker-compose up -d -V --build --force-recreate tsrelay
+
 down:
-	docker-compose kill
+	docker-compose down -v
 
-.PHONY: clean
 clean:
 	docker-compose rm -f
 
-.PHONY: logs
 logs:
 	docker-compose logs -f
 
-.PHONY: psql
 psql:
-	docker exec -ti --user postgres grafana-timescaledb_timescaledb_1 psql metrics
+	docker exec -ti --user user1 grafana-timescaledb_timescaledb_1 psql metrics
 
-.PHONY: bootstrap
-bootstrap: $(BOOTSTRAP_SQL)
-	docker exec -i --user postgres grafana-timescaledb_timescaledb_1 psql postgres < $(BOOTSTRAP_SQL)
+start: down up up-tsrelay
+	docker-compose logs -f
